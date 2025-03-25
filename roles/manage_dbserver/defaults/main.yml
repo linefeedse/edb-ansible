@@ -3,6 +3,7 @@
 pg_instance_name: main
 pg_version: 14
 pg_type: "PG"
+enable_edb_repo: false
 
 efm_cluster_name: "{{ pg_instance_name }}"
 efm_version: 4.5
@@ -21,7 +22,7 @@ use_validation: true
 
 pass_dir: "~/.edb"
 passfile: ""
-pg_postgres_conf_params: []
+#pg_postgres_conf_params: []
 # Example:
 # - name: listen_addresses
 #   value: "*"

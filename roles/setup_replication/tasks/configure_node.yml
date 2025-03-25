@@ -17,6 +17,9 @@
     - pg_version|int >= 15
     - pg_type == 'EPAS'
 
+- name: Print basebackup command.
+  debug: var=pg_basebackup
+
 - name: Create standby
   ansible.builtin.shell: >
     PGAPPNAME={{ inventory_hostname }} {{ pg_basebackup }}

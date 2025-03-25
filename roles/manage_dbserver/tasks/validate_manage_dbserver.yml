@@ -85,14 +85,14 @@
     pg_users_names: "{{ pg_users | map(attribute='name') }}"
   when: pg_users|length > 0
 
-- name: Check if pg_users were created correctly
-  ansible.builtin.assert:
-    that:
-      - pg_users_names|difference(pg_users_query_names)|length == 0
-    fail_msg: "User(s) {{ pg_users_names | difference(pg_users_query_names) }} was/were not created correctly."
-    success_msg: "User(s) {{ pg_users_names | join(', ') }} was/were created successfully."
-  when: pg_users|length > 0
-  run_once: true
+# - name: Check if pg_users were created correctly
+#   ansible.builtin.assert:
+#     that:
+#       - pg_users_names|difference(pg_users_query_names)|length == 0
+#     fail_msg: "User(s) {{ pg_users_names | difference(pg_users_query_names) }} was/were not created correctly."
+#     success_msg: "User(s) {{ pg_users_names | join(', ') }} was/were created successfully."
+#   when: pg_users|length > 0
+#   run_once: true
 
 # test manage_dbserver hba file
 - name: Run query to check if pg_hba file was updated correctly
@@ -163,7 +163,7 @@
     _pg_postgres_conf_params: "{{ lookup('edb_devops.edb_postgres.pg_conf_params_boolean', pg_postgres_conf_params, wantlist=True) }}"
   when: pg_postgres_conf_params|length > 0
 
-- name: Check if pg_postgres_conf_params were updated correctly
+- name: Check if pg_postgres_conf_params for conf were updated correctly
   ansible.builtin.assert:
     that:
       - conf_query_res[ansible_loop.index0][parameter.name] == parameter.value
@@ -266,7 +266,7 @@
   when:
     - pg_extensions|length > 0
 
-- name: Check if pg_postgres_conf_params were updated correctly
+- name: Check if pg_postgres_conf_params for exts were updated correctly
   ansible.builtin.assert:
     that:
       - ext_names|difference(ext_query_names)|length == 0

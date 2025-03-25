@@ -18,7 +18,6 @@
     - ansible_os_family == 'RedHat'
     - pg_type == 'PG'
     - pg_ssl
-    - ansible_architecture == "x86_64"
 
 - name: Add Centos7 packages to PG RedHat package_list
   ansible.builtin.set_fact:
@@ -30,11 +29,11 @@
     - pg_type == 'PG'
     - os == 'Centos7'
 
-- name: Add EL8/9 packages to PG RedHat package_list
+- name: Add EL8 packages to PG RedHat package_list
   ansible.builtin.set_fact:
     package_list: >-
       {{ package_list | default([]) + [
-        'python3-pycurl', 'python3-libselinux', 'python3-psycopg2', 'glibc-langpack-en'
+        'python3-pycurl', 'python3-libselinux', 'python3-psycopg2'
       ] }}
   when:
     - pg_type == 'PG'
@@ -74,7 +73,7 @@
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version == '7'
 
-- name: Add EL8/EL9 packages to EPAS RedHat package_list
+- name: Add EL8 packages to EPAS RedHat package_list
   ansible.builtin.set_fact:
     package_list: >-
       {{ package_list | default([]) + [
@@ -132,11 +131,12 @@
     - ansible_os_family == 'Debian'
     - pg_type == 'PG'
     - pg_ssl
+    - os in ['Ubuntu18','Debian9','Debian10']
 
 - name: Add Debian OS packages to package list for PG Debian
   ansible.builtin.set_fact:
     package_list: >-
-      {{ package_list | default([]) + ['python-psycopg2', 'python-ipaddress'] }}
+      {{ package_list | default([]) + ['python3-psycopg2'] }}
   when:
     - pg_type == 'PG'
     - ansible_distribution == 'Debian'
@@ -196,7 +196,7 @@
 - name: Check that all required packages have been installed
   ansible.builtin.assert:
     that:
-      - ansible_facts.packages[package] is defined
+      - "ansible_facts.packages[package] is defined"
     fail_msg: "Package {{ package }} has not been installed."
     success_msg: "Package {{ package }} has been installed."
   loop: "{{ package_list }}"

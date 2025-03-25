@@ -35,6 +35,7 @@ disable_logging: true
 use_replication_slots: true
 use_hostname: true
 update_etc_file: true
+enable_core_dump: false
 
 # setting validate_only to true allows you to validate setup on an existing node
 # use_validation flag applies to deployment configuration and validation after setup
@@ -110,12 +111,13 @@ supported_os:
   - RedHat8
   - RedHat9
   - Ubuntu20
-  - Ubuntu22
   - Debian9
   - Debian10
+  - Debian12
   - Rocky8
   - Rocky9
   - AlmaLinux8
+  - AlmaLinux9
   - OracleLinux7
 
 supported_pg_type:
@@ -129,3 +131,4 @@ supported_pg_version:
   - 13
   - 14
   - 15
+  - 16

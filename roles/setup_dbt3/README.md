@@ -80,7 +80,7 @@ $ ansible-playbook playbook.yml \
   -i inventory.yml \
   -u centos \
   --private-key <key.pem> \
-  --extra-vars="pg_type=PG"
+  --extra-vars="pg_version=13 pg_type=PG"
 ```
 
 ## License

@@ -22,7 +22,7 @@
     pg_type == 'EPAS' and
     ((pg_version|int < 12 and os in ['RedHat8','CentOS8','Rocky8','AlmaLinux8']) or
      (pg_version|int < 11 and os in ['Ubuntu18', 'Debian9']) or
-     (pg_version|int < 13 and os in ['Ubuntu20', 'Ubuntu22'])  or
+     (pg_version|int < 13 and os in ['Ubuntu20'])  or
      (pg_version|int < 12 and os in ['Debian10']))
 
 - name: Remove Postgres packages
@@ -36,6 +36,13 @@
 - name: Install and Configure Postgres on RedHat
   ansible.builtin.include_tasks: "{{ pg_type }}_{{ ansible_os_family }}_install.yml"
   when:
+    - not validate_only|bool
+    - not remove_only|bool
+
+- name: Enable coredump based on enable_core_dump
+  ansible.builtin.include_tasks: linux_coredump.yml
+  when:
+    - enable_core_dump|bool
     - not validate_only|bool
     - not remove_only|bool
 

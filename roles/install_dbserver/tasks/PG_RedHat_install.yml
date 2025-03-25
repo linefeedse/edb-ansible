@@ -28,7 +28,6 @@
       - python3-pycurl
       - python3-libselinux
       - python3-psycopg2
-      - glibc-langpack-en
     state: present
   become: true
   when: ansible_distribution_major_version in ['8', '9']
@@ -60,6 +59,4 @@
       - sslutils_{{ pg_version }}
     state: present
   become: true
-  when:
-    - pg_ssl
-    - ansible_architecture == "x86_64"
+  when: pg_ssl

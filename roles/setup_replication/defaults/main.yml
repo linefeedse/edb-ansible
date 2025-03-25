@@ -67,12 +67,13 @@ supported_os:
   - RedHat8
   - RedHat9
   - Ubuntu20
-  - Ubuntu22
   - Debian9
   - Debian10
+  - Debian12
   - Rocky8
   - Rocky9
   - AlmaLinux8
+  - AlmaLinux9
   - OracleLinux7
 
 supported_pg_type:
@@ -86,3 +87,4 @@ supported_pg_version:
   - 13
   - 14
   - 15
+  - 16
