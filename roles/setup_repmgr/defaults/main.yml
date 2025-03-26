@@ -55,6 +55,7 @@ supported_os:
   - Ubuntu22
   - Debian9
   - Debian10
+  - Debian12
   - Rocky8
   - Rocky9
   - OracleLinux7
