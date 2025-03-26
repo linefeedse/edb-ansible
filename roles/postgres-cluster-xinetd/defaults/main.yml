@@ -1,0 +1,5 @@
+postgresql_cluster_user: postgres
+postgresql_cluster_port: 5432
+postgresql_cluster_xinetd_port: 8008
+postgresql_cluster_unix_socket_directories:
+  - /var/run/postgresql

@@ -15,7 +15,7 @@
   loop: "{{ haproxy_backend_nodes }}"
   loop_control:
     loop_var: node
-  when: not node.haproxy_configure
+  #when: not node.haproxy_configure
   run_once: true
 
 - name: Create haproxy configuration file

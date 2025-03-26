@@ -78,6 +78,16 @@
     pg_stat_query_result: "{{ sql_query_output }}"
   become: true
 
+- name: Print query results
+  ansible.builtin.debug: var=sql_query_output
+  when:
+   - debug
+
+- name: Print standby node info
+  ansible.builtin.debug: var=standby_node_info
+  when:
+   - debug
+
 - name: Check if pg_stat_replication shows replication slots correctly
   ansible.builtin.assert:
     that:

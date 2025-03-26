@@ -24,11 +24,17 @@
     - haproxy_read_only_lb|bool
   become: true
 
+- name: Set the os variable
+  ansible.builtin.set_fact:
+    os: "{{ ansible_distribution }}{{ ansible_distribution_major_version }}"
+  when: os is not defined
+
 - name: Create haproxy group
   ansible.builtin.group:
     name: "{{ haproxy_group }}"
     state: present
   become: true
+  when: os not in [ 'Debian12' ]
 
 - name: Create haproxy user
   ansible.builtin.user:
@@ -38,6 +44,7 @@
     home: "{{ haproxy_user_home }}"
     state: present
   become: true
+  when: os not in [ 'Debian12' ]
 
 - name: Install haproxy
   ansible.builtin.package:

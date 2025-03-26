@@ -17,7 +17,7 @@ listen postgres
     bind {{ haproxy_listen_address }}:{{ haproxy_port }}
     stick-table type ip size 1
     stick on dst
-    option httpchk OPTIONS /primary
+    option httpchk
     http-check expect status 200
     default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
     {% for line in haproxy_server_lines %}
@@ -30,8 +30,8 @@ listen postgres_replica
     balance roundrobin
     stick-table type ip size 1
     stick on dst
-    option httpchk OPTIONS /replica
-    http-check expect status 200
+    option httpchk
+    http-check expect status 206
     default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
     {% for line in haproxy_server_lines %}
     {{ line }}
