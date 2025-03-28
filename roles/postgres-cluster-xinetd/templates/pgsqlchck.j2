@@ -53,7 +53,11 @@ then
     http_response {{ postgresql_cluster_xinetd_standby_http_code | default('206') }} "{{ postgresql_cluster_xinetd_standby_http_response | default('Standby') }}"
 elif [ "$VALUE" == "f" ]
 then
-    http_response {{ postgresql_cluster_xinetd_primary_http_code | default('200') }} "{{ postgresql_cluster_xinetd_primary_http_response | default('Primary') }}"
-else
-    http_response {{ postgresql_cluster_xinetd_down_http_code | default('503') }} "{{ postgresql_cluster_xinetd_down_http_response | default('DB Down') }}"
+    NUMSLOTS=`psql -t -p 5432 -c "select active from pg_replication_slots" -X -A -U {{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }} -d template1 2> /dev/null|wc -l`
+    NUMACTIVE=`psql -t -p 5432 -c "select active from pg_replication_slots where active='t'" -X -A -U {{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }} -d template1 2> /dev/null|wc -l`
+    if [ "$NUMSLOTS" -lt 1 -o "$NUMACTIVE" -gt 0 ]
+    then
+        http_response {{ postgresql_cluster_xinetd_primary_http_code | default('200') }} "{{ postgresql_cluster_xinetd_primary_http_response | default('Primary') }}"
+    fi
 fi
+http_response {{ postgresql_cluster_xinetd_down_http_code | default('503') }} "{{ postgresql_cluster_xinetd_down_http_response | default('DB Down') }}"
