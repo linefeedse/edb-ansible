@@ -38,7 +38,9 @@
   ansible.builtin.package:
     name: "xinetd"
     state: present
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family != 'RedHat'
 
 - name: Ensure that xinetd is started and enabled on boot
   tags: xinetd
@@ -47,7 +49,9 @@
     name: "xinetd"
     state: started
     enabled: true
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family != 'RedHat'
 
 - name: Template pgsqlchck script in place
   ansible.builtin.template:
@@ -65,13 +69,39 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family != 'RedHat'
+
+- name: Template pgsqlchck socket into /etc/systemd
+  ansible.builtin.template:
+    src: pgsqlcheck_systemd_socket.j2
+    dest: /etc/systemd/system/pgsqlchk.socket
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family == 'RedHat'
+
+- name: Template pgsqlchck service into /etc/systemd
+  ansible.builtin.template:
+    src: pgsqlcheck_systemd_service.j2
+    dest: /etc/systemd/system/pgsqlchk@.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family == 'RedHat'
 
 - name: "Add pgsqlchck line to /etc/services"
   ansible.builtin.lineinfile:
     path: /etc/services
     line: "pgsqlchk {{ postgresql_cluster_xinetd_port }}/tcp # Ansible Managed: pgsqlchk"
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family != 'RedHat'
 
 - name: "Reload xinetd"
   become: true
@@ -79,7 +109,20 @@
     name: "xinetd"
     state: "reloaded"
     enabled: true
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family != 'RedHat'
+
+- name: Ensure that systemd socket is started and enabled on boot
+  tags: xinetd
+  become: true
+  ansible.builtin.service:
+    name: "pgsqlchk.socket"
+    state: started
+    enabled: true
+  when:
+    - not (postgresql_cluster_is_monitor | default('False') | bool)
+    - ansible_os_family == 'RedHat'
 
 # - name: "Allow incoming access to the xinetd postgres port {{ postgresql_cluster_xinetd_port | default('23267') }} for all cluster clients"
 #   ufw:

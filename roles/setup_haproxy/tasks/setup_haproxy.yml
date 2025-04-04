@@ -55,6 +55,12 @@
 - name: Include the haproxy_configure.yml
   ansible.builtin.include_tasks: haproxy_configure.yml
 
+- name: Set haproxy_connect_any SELinux flag on and keep it persistent across reboots
+  ansible.posix.seboolean:
+    name: haproxy_connect_any
+    state: true
+    persistent: true
+
 - name: Enable and start systemd service
   ansible.builtin.systemd:
     name: "{{ haproxy_service }}"

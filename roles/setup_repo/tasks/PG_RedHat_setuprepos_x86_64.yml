@@ -24,7 +24,17 @@
     - enable_pgdg_repo|bool
   become: true
 
-- name: Download EPEL GPG key for EL8
+- name: Download PGDG GPG key for EL9
+  ansible.builtin.rpm_key:
+    key: "{{ pg_gpg_key_9_x86_64 }}"
+    state: present
+  when:
+    - ansible_distribution_major_version in ['8', '9']
+    - pg_type == 'PG'
+    - enable_pgdg_repo|bool
+  become: true
+
+- name: Download EPEL GPG key for E98
   ansible.builtin.rpm_key:
     key: "{{ epel_gpg_key_8 }}"
     state: present

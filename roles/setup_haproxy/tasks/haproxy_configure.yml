@@ -26,4 +26,4 @@
     group: "{{ haproxy_group }}"
     mode: "0644"
   become: true
-  no_log: "{{ disable_logging }}"
+  #no_log: "{{ disable_logging }}"

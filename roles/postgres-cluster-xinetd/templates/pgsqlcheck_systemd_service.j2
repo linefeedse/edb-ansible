@@ -1,0 +1,8 @@
+[Unit]
+Description=Pgsqlcheck Per-Connection Server
+
+[Service]
+ExecStart=-/opt/pgsqlchk     # the binary to start
+User={{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}
+Group={{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}
+StandardInput=socket

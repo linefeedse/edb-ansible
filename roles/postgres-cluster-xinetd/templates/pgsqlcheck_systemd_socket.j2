@@ -1,0 +1,9 @@
+[Unit]
+Description=Pgsqlcheck Socket
+
+[Socket]
+ListenStream={{ postgresql_cluster_xinetd_port }}
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
