@@ -1,0 +1,142 @@
+---
+- hosts: all
+  name: Install and config Postgres
+  become: yes
+  gather_facts: yes
+  any_errors_fatal: true
+
+  collections:
+    - edb_devops.edb_postgres
+
+  vars:
+    pg_version: 16
+    pg_type: "PG"
+    enable_edb_repo: false
+
+  roles:
+    - role: setup_repo
+      when: "'setup_repo' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+      tags:
+        - repo
+    - role: install_dbserver
+      when: "'install_dbserver' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+      tags:
+        - install
+    - role: setup_haproxy
+      tags:
+        - proxy
+
+- hosts: postgresql1
+  name: Init master
+  become: yes
+  gather_facts: yes
+  any_errors_fatal: true
+
+  collections:
+    - edb_devops.edb_postgres
+
+  vars:
+    pg_version: 16
+    pg_users:
+      - name: app
+        db: app
+        prov: ALL
+        pass: oogabooga99
+    pg_databases:
+      - name: app
+    pg_postgres_conf_params:
+      - name: listen_addresses
+        value: "*"
+
+  roles:
+    - role: init_dbserver
+      when: "'init_dbserver' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+      tags:
+        - initdb
+    - role: manage_dbserver
+      when: "'manage_dbserver' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+      tags:
+        - manage
+
+- hosts: standby
+  name: Replicate
+  become: yes
+  gather_facts: yes
+  any_errors_fatal: true
+
+  collections:
+    - edb_devops.edb_postgres
+
+  pre_tasks:
+    - name: Initialize the user defined variables
+      set_fact:
+        pg_version: 16
+        pg_type: "PG"
+        enable_edb_repo: false
+  vars:
+    pg_version: 16
+    pg_type: "PG"
+  roles:
+    - role: setup_replication
+      when:
+        - "'setup_replication' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+        - "'replicate' in ansible_run_tags"
+      tags:
+        - replicate
+
+
+- hosts: all
+  name: Configure all servers
+  become: yes
+  gather_facts: yes
+  any_errors_fatal: true
+
+  collections:
+    - edb_devops.edb_postgres
+
+  vars:
+    pg_version: 16
+    pg_postgres_conf_params:
+      - name: listen_addresses
+        value: "*"
+    pg_hba_ip_addresses:
+      - contype: "host"
+        users: "all"
+        databases: "all"
+        method: "scram-sha-256"
+        source: "192.168.0.0/16"
+        state: present
+
+  roles:
+    - role: manage_dbserver
+      when: "'manage_dbserver' in lookup('edb_devops.edb_postgres.supported_roles', wantlist=True)"
+      tags:
+        - manage
+    - role: postgres-cluster-xinetd
+      tags:
+        - proxy
+
+- hosts: all
+  name: Install and config Repmgr
+  become: yes
+  gather_facts: yes
+  any_errors_fatal: true
+
+  collections:
+    - edb_devops.edb_postgres
+
+  pre_tasks:
+    - name: Initialize the user defined variables
+      set_fact:
+        pg_version: 16
+        pg_type: "PG"
+        repmgr_failover: automatic
+        repmgr_reconnect_attemps: 2
+        repmgr_reconnect_interval: 2
+      tags:
+        - always
+
+  roles:
+    - role: setup_repmgr
+      tags:
+        - repmgr
